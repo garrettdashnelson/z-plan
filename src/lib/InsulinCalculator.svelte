@@ -1,4 +1,6 @@
 <script>
+  import DexReader from './DexReader.svelte';
+
   let currentBG = $state(150);
   let targetMode = $state('day');
   let customTarget = $state(150);
@@ -67,6 +69,8 @@
         bind:value={currentBG}
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg bg-green-50 text-black px-4 py-2"
       />
+
+      <DexReader />
     </div>
 
     <!-- Target BG Section -->
