@@ -39,11 +39,22 @@
   );
 
   let totalDose = $derived(
-    roundedCorrectionDose + roundedCarbDose
+    Math.round((roundedCorrectionDose + roundedCarbDose) * 10) / 10
   );
+
+  let roundedTotalDose = $derived.by(() => {
+    const decimal = totalDose % 1;
+    const whole = Math.floor(totalDose);
+    
+    if (decimal < 0.3) return whole;
+    if (decimal < 0.8) return whole + 0.5;
+    return whole + 1;
+  });
 </script>
 
 <div class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+
+
   <form class="space-y-6">
     <!-- Current BG Input -->
     <div>
@@ -54,7 +65,7 @@
         type="number"
         id="currentBG"
         bind:value={currentBG}
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg text-black px-4 py-2"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg bg-green-50 text-black px-4 py-2"
       />
     </div>
 
@@ -90,7 +101,7 @@
         <input
           type="number"
           bind:value={customTarget}
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg text-black px-4 py-2"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg bg-green-50 text-black px-4 py-2"
         />
       {/if}
     </div>
@@ -120,7 +131,7 @@
         <input
           type="number"
           bind:value={customCorrection}
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg text-black px-4 py-2"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg bg-green-50 text-black px-4 py-2"
         />
       {/if}
     </div>
@@ -143,7 +154,7 @@
         type="number"
         id="newCarbs"
         bind:value={newCarbs}
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg text-black px-4 py-2"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg bg-green-50 text-black px-4 py-2"
       />
     </div>
 
@@ -172,7 +183,7 @@
         <input
           type="number"
           bind:value={customCarbRatio}
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg text-black px-4 py-2"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg bg-green-50 text-black px-4 py-2"
         />
       {/if}
     </div>
@@ -184,8 +195,10 @@
     </div>
   </form>
 
+
   <!-- Total Dose Display -->
-  <div class="mt-8 p-4 bg-red-800 rounded-md">
-    <div class="text-xl font-bold text-white">Total amount: {totalDose} insulin units</div>
+  <div class="mt-8 p-4 bg-red-900 rounded-md">
+    <div class="text-lg font-normal text-white">Summed: {totalDose} insulin units</div>
+    <div class="text-xl font-bold text-white mt-2">Administer: {roundedTotalDose} insulin units</div>
   </div>
 </div>
