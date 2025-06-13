@@ -80,14 +80,14 @@
           class="px-4 py-2 rounded-md {targetMode === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
           onclick={() => targetMode = 'day'}
         >
-          Day (150)
+          Day <span class="ml-2 px-2 py-0.5 rounded-full text-sm {targetMode === 'day' ? 'bg-blue-600' : 'bg-gray-300'}">150</span>
         </button>
         <button
           type="button"
           class="px-4 py-2 rounded-md {targetMode === 'night' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
           onclick={() => targetMode = 'night'}
         >
-          Night (180)
+          Night <span class="ml-2 px-2 py-0.5 rounded-full text-sm {targetMode === 'night' ? 'bg-blue-600' : 'bg-gray-300'}">180</span>
         </button>
         <button
           type="button"
@@ -117,7 +117,7 @@
           class="px-4 py-2 rounded-md {correctionMode === 'default' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
           onclick={() => correctionMode = 'default'}
         >
-          Default (250)
+          Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {correctionMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">250</span>
         </button>
         <button
           type="button"
@@ -169,7 +169,7 @@
           class="px-4 py-2 rounded-md {carbRatioMode === 'default' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
           onclick={() => carbRatioMode = 'default'}
         >
-          Default (65)
+          Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {carbRatioMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">65</span>
         </button>
         <button
           type="button"
@@ -198,7 +198,7 @@
 
   <!-- Total Dose Display -->
   <div class="mt-8 p-4 bg-red-900 rounded-md">
-    <div class="text-lg font-normal text-white">Summed: {totalDose} insulin units</div>
+    <div class="text-lg font-normal text-white">Total amount: {totalDose} insulin units</div>
     <div class="text-xl font-bold text-white mt-2">Administer: {roundedTotalDose} insulin units</div>
   </div>
 </div>
