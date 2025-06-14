@@ -5,10 +5,10 @@
   let targetMode = $state('day');
   let customTarget = $state(150);
   let correctionMode = $state('default');
-  let customCorrection = $state(250);
-  let newCarbs = $state(10);
+  let customCorrection = $state(200);
+  let newCarbs = $state(0);
   let carbRatioMode = $state('default');
-  let customCarbRatio = $state(65);
+  let customCarbRatio = $state(55);
 
   let targetBG = $derived(
     targetMode === 'day' ? 150 :
@@ -17,11 +17,11 @@
   );
 
   let correctionFactor = $derived(
-    correctionMode === 'default' ? 250 : customCorrection
+    correctionMode === 'default' ? 200 : customCorrection
   );
 
   let carbRatio = $derived(
-    carbRatioMode === 'default' ? 65 : customCarbRatio
+    carbRatioMode === 'default' ? 55 : customCarbRatio
   );
 
   let correctionDose = $derived(
@@ -121,7 +121,7 @@
           class="px-4 py-2 rounded-md {correctionMode === 'default' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
           onclick={() => correctionMode = 'default'}
         >
-          Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {correctionMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">250</span>
+          Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {correctionMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">200</span>
         </button>
         <button
           type="button"
@@ -173,7 +173,7 @@
           class="px-4 py-2 rounded-md {carbRatioMode === 'default' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
           onclick={() => carbRatioMode = 'default'}
         >
-          Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {carbRatioMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">65</span>
+          Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {carbRatioMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">55</span>
         </button>
         <button
           type="button"
