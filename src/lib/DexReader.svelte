@@ -5,7 +5,7 @@
 
 	async function fetchData() {
 		try {
-			const response = await fetch('https://raw.githubusercontent.com/garrettdashnelson/dex-data-worker/refs/heads/main/data-exports/latest.json');
+			const response = await fetch('.netlify/functions/dexcom');
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
@@ -23,16 +23,19 @@
 </script>
 
 <div class="dex-reader font-mono bg-amber-50 my-4 p-4 rounded-md">
-    <h1 class="text-md font-bold mb-2">Live Dexcom Data</h1>
+    <h1 class="text-md font-bold mb-2">Latest Dexcom Data</h1>
 	{#if loading}
 		<p>Loading...</p>
 	{:else if error}
 		<p class="error">Error: {error}</p>
 	{:else if data}
 		<div class="data flex flex-col gap-1">
-            <p>Time: {new Date(data.timestamp).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</p>
-			<p>Value: {data.value}</p>
-			<p>Trend: {data.trend}</p>
+			<div class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 border border-amber-200">
+				<span class="text-lg font-semibold">{data.value}</span>
+				<span class="ml-1">{@html data.trendDescription}</span>
+			</div>
+			<p class="text-sm text-gray-500">{new Date(data.timestamp).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</p>
+
 		</div>
 	{/if}
 </div>

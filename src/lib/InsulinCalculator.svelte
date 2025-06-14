@@ -25,19 +25,19 @@
   );
 
   let correctionDose = $derived(
-    ((currentBG - targetBG) / correctionFactor).toPrecision(4)
+    Math.max(0, ((currentBG - targetBG) / correctionFactor)).toPrecision(4)
   );
 
   let roundedCorrectionDose = $derived(
-    Math.floor(((currentBG - targetBG) / correctionFactor) * 10) / 10
+    Math.max(0, Math.floor(((currentBG - targetBG) / correctionFactor) * 10) / 10)
   );
 
   let carbDose = $derived(
-    (newCarbs / carbRatio).toPrecision(4)
+    Math.max(0, (newCarbs / carbRatio)).toPrecision(4)
   );
 
   let roundedCarbDose = $derived(
-    Math.floor((newCarbs / carbRatio) * 10) / 10
+    Math.max(0, Math.floor((newCarbs / carbRatio) * 10) / 10)
   );
 
   let totalDose = $derived(
@@ -203,6 +203,6 @@
   <!-- Total Dose Display -->
   <div class="mt-8 p-4 bg-red-900 rounded-md">
     <div class="text-lg font-normal text-white">Total amount: {totalDose} insulin units</div>
-    <div class="text-xl font-bold text-white mt-2">Administer: {roundedTotalDose} insulin units</div>
+    <div class="text-xl font-bold text-white mt-2">Administer: {roundedTotalDose.toFixed(1)} insulin units</div>
   </div>
 </div>
