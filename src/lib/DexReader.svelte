@@ -1,4 +1,5 @@
 <script>
+	let { onData } = $props();
 	let data = $state(null);
 	let error = $state(null);
 	let loading = $state(true);
@@ -10,6 +11,7 @@
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 			data = await response.json();
+			if (onData) onData(data);
 		} catch (e) {
 			error = e.message;
 		} finally {
