@@ -5,9 +5,9 @@
   let currentBG = $state(150);
   let dexcomData = $state(null);
   let targetMode = $state('day');
-  let customTarget = $state(150);
+  let customTarget = $state(settings.dayTarget);
   let correctionMode = $state('default');
-  let customCorrection = $state(200);
+  let customCorrection = $state(settings.defaultCorrection);
   let newCarbs = $state(0);
   let carbRatioMode = $state('default');
   let customCarbRatio = $state(settings.defaultCarbRatio);
@@ -20,13 +20,13 @@
   }
 
   let targetBG = $derived(
-    targetMode === 'day' ? 150 :
-    targetMode === 'night' ? 180 :
+    targetMode === 'day' ? settings.dayTarget :
+    targetMode === 'night' ? settings.nightTarget :
     customTarget
   );
 
   let correctionFactor = $derived(
-    correctionMode === 'default' ? 200 : customCorrection
+    correctionMode === 'default' ? settings.defaultCorrection : customCorrection
   );
 
   let carbRatio = $derived(
@@ -103,14 +103,14 @@
             class="px-4 py-2 rounded-md {targetMode === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
             onclick={() => targetMode = 'day'}
           >
-            Day <span class="ml-2 px-2 py-0.5 rounded-full text-sm {targetMode === 'day' ? 'bg-blue-600' : 'bg-gray-300'}">150</span>
+            Day <span class="ml-2 px-2 py-0.5 rounded-full text-sm {targetMode === 'day' ? 'bg-blue-600' : 'bg-gray-300'}">{settings.dayTarget}</span>
           </button>
           <button
             type="button"
             class="px-4 py-2 rounded-md {targetMode === 'night' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
             onclick={() => targetMode = 'night'}
           >
-            Night <span class="ml-2 px-2 py-0.5 rounded-full text-sm {targetMode === 'night' ? 'bg-blue-600' : 'bg-gray-300'}">180</span>
+            Night <span class="ml-2 px-2 py-0.5 rounded-full text-sm {targetMode === 'night' ? 'bg-blue-600' : 'bg-gray-300'}">{settings.nightTarget}</span>
           </button>
           <button
             type="button"
@@ -140,7 +140,7 @@
             class="px-4 py-2 rounded-md {correctionMode === 'default' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}"
             onclick={() => correctionMode = 'default'}
           >
-            Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {correctionMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">200</span>
+            Default <span class="ml-2 px-2 py-0.5 rounded-full text-sm {correctionMode === 'default' ? 'bg-blue-600' : 'bg-gray-300'}">{settings.defaultCorrection}</span>
           </button>
           <button
             type="button"
