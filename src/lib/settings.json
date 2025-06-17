@@ -1,6 +1,6 @@
 {
-  "defaultCarbRatio": 40,
+  "defaultCarbRatio": 35,
   "nightTarget": 150,
   "dayTarget": 150,
-  "defaultCorrection": 180
+  "defaultCorrection": 165
 } 
