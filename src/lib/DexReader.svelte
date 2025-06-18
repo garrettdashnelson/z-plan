@@ -24,7 +24,7 @@
 	});
 </script>
 
-<div class="dex-reader font-mono bg-amber-50 my-4 p-4 rounded-md">
+<div class="dex-reader font-mono bg-purple-100 my-4 p-4 rounded-md">
     <h1 class="text-md font-bold mb-2">Latest Dexcom Data</h1>
 	{#if loading}
 		<p>Loading...</p>
@@ -32,12 +32,16 @@
 		<p class="error">Error: {error}</p>
 	{:else if data}
 		<div class="data flex flex-col gap-1">
-			<div class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 border border-amber-200">
+			<div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-300 border border-purple-700">
 				<span class="text-lg font-semibold">{data.value}</span>
 				<span class="ml-1">{@html data.trendDescription}</span>
 			</div>
 			<p class="text-sm text-gray-500">{new Date(data.timestamp).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'})}</p>
-
+			{#if data && data.timestamp && (Date.now() - new Date(data.timestamp).getTime()) > 10 * 60 * 1000}
+				<div class="inline-flex items-center px-3 py-1 rounded-sm bg-red-300 border border-yellow-700 text-sm">
+					Reading is more than 10 minutes old
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
