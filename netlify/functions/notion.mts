@@ -25,7 +25,7 @@ interface NotionResponse {
 // In-memory cache
 let cache: {
     timestamp: number;
-    data: NotionResponse | null;
+    data: object | null;
 } = {
     timestamp: 0,
     data: null
@@ -125,11 +125,6 @@ export const handler: Handler = async (event, context) => {
 
         const data: NotionResponse = await response.json();
 
-        cache = {
-            timestamp: now,
-            data: data
-        };
-
         // Set CORS headers for browser access
         const headers = {
             'Content-Type': 'application/json',
@@ -138,16 +133,24 @@ export const handler: Handler = async (event, context) => {
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
         };
 
+        let d = {
+            success: true,
+            data: data.results,
+            next_cursor: data.next_cursor,
+            has_more: data.has_more,
+            total_results: data.results.length
+        }
+
+        cache = {
+            timestamp: now,
+            data: d
+        };
+
+
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({
-                success: true,
-                data: data.results,
-                next_cursor: data.next_cursor,
-                has_more: data.has_more,
-                total_results: data.results.length
-            })
+            body: JSON.stringify(d)
         };
 
     } catch (err: unknown) {
