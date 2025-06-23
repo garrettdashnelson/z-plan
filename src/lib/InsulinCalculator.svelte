@@ -70,6 +70,8 @@
     if (decimal < 0.8) return whole + 0.5;
     return whole + 1;
   });
+
+
 </script>
 
 <div class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -106,8 +108,8 @@
         />
       </svg>
       <span class="text-sm text-yellow-700"
-        >Turn off correction calculator if it has been less than three hours since the
-        last fast-acting dose</span
+        >Turn off correction calculator if it has been less than three hours
+        since the last fast-acting dose</span
       >
     </div>
 
@@ -218,7 +220,10 @@
       <!-- Correction Dose Display -->
       <div class="mt-6 p-4 bg-white rounded-md border border-gray-200">
         <div class="text-lg font-medium text-gray-700">
-          Correction dose: {correctionDose} units &rarr; <span class="font-black text-red-800">{roundedCorrectionDose} units</span>
+          Correction dose: {correctionDose} units &rarr;
+          <span class="font-black text-red-800"
+            >{roundedCorrectionDose} units</span
+          >
         </div>
       </div>
     {/if}
@@ -294,7 +299,8 @@
       <!-- Carb Dose Display -->
       <div class="mt-6 p-4 bg-white rounded-md border border-gray-200">
         <div class="text-lg font-medium text-gray-700">
-          Carbohydrate dose: {carbDose} units &rarr; <span class="font-black text-red-800">{roundedCarbDose} units</span>
+          Carbohydrate dose: {carbDose} units &rarr;
+          <span class="font-black text-red-800">{roundedCarbDose} units</span>
         </div>
       </div>
     {/if}
