@@ -16,7 +16,7 @@
 			loading = true;
 			error = null;
 
-			const response = await fetch("/.netlify/functions/notion");
+			const response = await fetch(".netlify/functions/notion");
 
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
