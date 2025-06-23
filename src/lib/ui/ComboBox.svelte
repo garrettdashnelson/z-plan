@@ -81,7 +81,7 @@
         <ul
           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
         >
-          {#each filteredItems as item, i}
+          {#each filteredItems.sort((a, b) => a.name.localeCompare(b.name)) as item, i}
             <li
               class="px-4 py-2 text-left hover:bg-gray-200 cursor-pointer {i ===
               highlightedIndex

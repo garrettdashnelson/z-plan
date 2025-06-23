@@ -50,7 +50,7 @@
 
 	// Handle meal selection
 	function handleMealSelect(item) {
-		computedMeal.push(item.id);
+		computedMeal.push({"id": item.id, "multiplier": 1});
 	}
 
 	function removeItem(index) {
@@ -61,8 +61,8 @@
 		computedMeal.reduce(
 			(sum, entry) =>
 				sum +
-				(meals.find((m) => m.id === entry)?.properties["Carb Count"]
-					?.number || 0),
+				(meals.find((m) => m.id === entry.id)?.properties["Carb Count"]
+					?.number || 0) * entry.multiplier,
 			0,
 		),
 	);
@@ -92,7 +92,8 @@
 		{#if computedMeal && computedMeal.length > 0}
 			{#each computedMeal as entry, index}
 				<MealComponentEntry
-					meal={meals.find((m) => m.id === entry)}
+					meal={meals.find((m) => m.id === entry.id)}
+					entry={entry}
 					removeItem={() => removeItem(index)}
 				/>
 			{/each}
