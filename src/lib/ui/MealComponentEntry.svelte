@@ -33,7 +33,7 @@
         </div>
         <div class="no-print">✖️  
             <input
-                class="bg-gray-200 rounded-md p-1 w-12"
+                class="bg-gray-200 rounded-md text-lg p-1 w-12"
                 type="number"
                 bind:value={entry.multiplier}
             />
