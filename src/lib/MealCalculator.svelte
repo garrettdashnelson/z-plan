@@ -6,6 +6,7 @@
 	let loading = $state(true);
 	let error = $state(null);
 	let computedMeal = $state([]);
+	let printFormat = $state(false);
 
 	import ComboBox from "./ui/ComboBox.svelte";
 	import MealComponentEntry from "./ui/MealComponentEntry.svelte";
@@ -81,7 +82,7 @@
 				const servingUnit =
 					meal?.properties["Serving unit measure"]?.rich_text?.[0]
 						?.plain_text || "";
-				return `• ${meal?.name}: ${carbCount}g carbs in ${servingAmount}${servingUnit}`;
+				return `• ${meal?.name}: ${carbCount}g carbs in ${servingAmount} ${servingUnit}`;
 			})
 			.join("\n");
 		text += `\n\nTotal carbs: ${totalCarbs}g`;
@@ -94,7 +95,7 @@
 	});
 </script>
 
-<div class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+<div class="{printFormat ? 'max-w-full' : 'max-w-lg'} mx-auto p-6 bg-white rounded-lg {printFormat ? 'shadow-none' : 'shadow-md'}">
 	{#if loading}
 		<div class="loading">
 			<p>Loading data from Notion...</p>
@@ -114,7 +115,9 @@
 				<MealComponentEntry
 					meal={meals.find((m) => m.id === entry.id)}
 					{entry}
-					removeItem={() => removeItem(index)}
+					{printFormat}
+					removeItem={() => removeItem(index)
+					}
 				/>
 			{/each}
 
@@ -149,6 +152,17 @@
 				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
 			>
 				Share
+			</button>
+			<button
+				onclick={() => {
+					printFormat = true;
+					setTimeout(() => {
+						window.print();
+					}, 100);
+				}}
+				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
+			>
+				Print
 			</button>
 
 			</div>
