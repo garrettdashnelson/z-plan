@@ -50,7 +50,7 @@
 
 	// Handle meal selection
 	function handleMealSelect(item) {
-		computedMeal.push({"id": item.id, "multiplier": 1});
+		computedMeal.push({ id: item.id, multiplier: 1 });
 	}
 
 	function removeItem(index) {
@@ -62,10 +62,31 @@
 			(sum, entry) =>
 				sum +
 				(meals.find((m) => m.id === entry.id)?.properties["Carb Count"]
-					?.number || 0) * entry.multiplier,
+					?.number || 0) *
+					entry.multiplier,
 			0,
 		),
 	);
+
+	let textRenderedComputedMeal = $derived.by(() => {
+		let text = computedMeal
+			.map((entry) => {
+				const meal = meals.find((m) => m.id === entry.id);
+				const carbCount =
+					(meal?.properties["Carb Count"]?.number || 0) *
+					entry.multiplier;
+				const servingAmount =
+					(meal?.properties["Serving unit amount"]?.number || 0) *
+					entry.multiplier;
+				const servingUnit =
+					meal?.properties["Serving unit measure"]?.rich_text?.[0]
+						?.plain_text || "";
+				return `• ${meal?.name}: ${carbCount}g carbs in ${servingAmount}${servingUnit}`;
+			})
+			.join("\n");
+		text += `\n\nTotal carbs: ${totalCarbs}g`;
+		return text;
+	});
 
 	// Load meals when component mounts
 	onMount(() => {
@@ -74,7 +95,6 @@
 </script>
 
 <div class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
-
 	{#if loading}
 		<div class="loading">
 			<p>Loading data from Notion...</p>
@@ -93,7 +113,7 @@
 			{#each computedMeal as entry, index}
 				<MealComponentEntry
 					meal={meals.find((m) => m.id === entry.id)}
-					entry={entry}
+					{entry}
 					removeItem={() => removeItem(index)}
 				/>
 			{/each}
@@ -102,6 +122,35 @@
 				<div class="text-lg font-bold text-white">
 					Total carbs: {totalCarbs}g
 				</div>
+			</div>
+			<textarea id="rendered-meal-text" readonly class="hidden" bind:value={textRenderedComputedMeal} />
+			<div>
+			<button
+				onclick={() => {
+					const textarea = document.getElementById('rendered-meal-text');
+					textarea.select();
+					navigator.clipboard.writeText(textarea.value);
+					window.alert("Copied to clipboard");
+				}}
+				class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
+			>
+				Copy to clipboard
+			</button>
+			<button
+				onclick={() => {
+					if (navigator.share) {
+						navigator.share({
+							text: textRenderedComputedMeal
+						}).catch(err => {
+							console.error('Share failed:', err);
+						});
+					}
+				}}
+				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
+			>
+				Share
+			</button>
+
 			</div>
 		{/if}
 	{/if}
