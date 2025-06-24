@@ -121,8 +121,8 @@
 				/>
 			{/each}
 
-			<div class="mt-8 p-4 bg-red-900 rounded-md">
-				<div class="text-lg font-bold text-white">
+			<div class="mt-8 p-4 {printFormat ? '' : 'bg-red-900 rounded-md'}">
+				<div class="{printFormat ? 'text-6xl text-black' : 'text-lg text-white'}  font-bold">
 					Total carbs: {totalCarbs}g
 				</div>
 			</div>

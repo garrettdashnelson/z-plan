@@ -9,9 +9,9 @@
     );
 </script>
 
-<div class="flex flex-col justify-between p-2 bg-gray-100 rounded-lg my-2">
+<div class="flex flex-col justify-between {printFormat ? 'text-3xl' : 'bg-gray-100 rounded-lg p-2'} rounded-lg my-2">
     <div class="flex flex-row justify-between mb-2">
-        <div class="text-lg font-bold">{meal.name}</div>
+        <div class="{printFormat ? 'text-5xl' : 'text-lg'} font-bold">{meal.name}</div>
         <div class="flex-row">
             <button
                 onclick={removeItem}
@@ -21,7 +21,7 @@
             </button>
         </div>
     </div>
-    <div class="flex flex-row justify-between items-center text-sm">
+    <div class="flex flex-row justify-between items-center {printFormat ? 'text-4xl' : 'text-sm'}">
         <div>
             <strong>{carbCount}g</strong> carbs in serving
             <strong
