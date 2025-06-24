@@ -16,7 +16,7 @@
         <div class="flex-row">
             <button
                 onclick={removeItem}
-                class="text-red-500 hover:text-red-700 bg-red-100 rounded-md p-1"
+                class="text-red-500 hover:text-red-700 bg-red-100 rounded-md p-1 no-print"
             >
                 ⛔️
             </button>
@@ -31,9 +31,9 @@
                     ?.plain_text || ""}</strong
             >
         </div>
-        <div>✖️  
+        <div class="no-print">✖️  
             <input
-                class="bg-gray-200 rounded-md p-1"
+                class="bg-gray-200 rounded-md p-1 w-12"
                 type="number"
                 bind:value={entry.multiplier}
             />
