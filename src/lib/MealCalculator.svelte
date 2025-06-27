@@ -82,7 +82,7 @@
 				const servingUnit =
 					meal?.properties["Serving unit measure"]?.rich_text?.[0]
 						?.plain_text || "";
-				return `• ${meal?.name}: ${carbCount}g carbs in ${servingAmount} ${servingUnit}`;
+				return `• ${meal?.name}: ${carbCount.toFixed(1)}g carbs in ${servingAmount.toFixed(1)} ${servingUnit}`;
 			})
 			.join("\n");
 		text += `\n\nTotal carbs: ${totalCarbs}g`;

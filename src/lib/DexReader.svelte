@@ -4,6 +4,8 @@
 	let error = $state(null);
 	let loading = $state(true);
 
+	import { onMount } from "svelte";
+
 	async function fetchData() {
 		try {
 			const response = await fetch('.netlify/functions/dexcom');
@@ -19,8 +21,9 @@
 		}
 	}
 
-	$effect(() => {
+	onMount(() => {
 		fetchData();
+		setInterval(fetchData, 5 * 60 * 1000);
 	});
 </script>
 
