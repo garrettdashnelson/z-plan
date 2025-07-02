@@ -3,6 +3,7 @@
   import MealCalculator from "./lib/MealCalculator.svelte";
 
   let activeFunction = $state("insulin");
+
 </script>
 
 <main>
@@ -19,10 +20,11 @@
         </select>
       </div>
     </div>
-  {#if activeFunction === "insulin"}
+  <div class:hidden={activeFunction !== "insulin"}>
     <InsulinCalculator />
-  {:else if activeFunction === "meals"}
+  </div>
+  <div class:hidden={activeFunction !== "meals"}>
     <MealCalculator />
-  {/if}
+  </div>
 </main>
 

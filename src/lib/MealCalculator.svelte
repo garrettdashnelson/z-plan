@@ -11,6 +11,8 @@
 	import ComboBox from "./ui/ComboBox.svelte";
 	import MealComponentEntry from "./ui/MealComponentEntry.svelte";
 
+	import { mealCalculatedCarbs } from "./state.svelte";
+
 	// Fetch meals from Notion function
 	async function fetchMeals() {
 		try {
@@ -123,7 +125,7 @@
 
 			<div class="mt-8 p-4 {printFormat ? '' : 'bg-red-900 rounded-md'}">
 				<div class="{printFormat ? 'text-6xl text-black' : 'text-lg text-white'}  font-bold">
-					Total carbs: {totalCarbs}g
+					Total carbs: {totalCarbs.toFixed(1)}g
 				</div>
 			</div>
 			<textarea id="rendered-meal-text" readonly class="hidden" bind:value={textRenderedComputedMeal} />
@@ -163,6 +165,15 @@
 				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
 			>
 				Print
+			</button>
+
+			<button
+				onclick={() => {
+					mealCalculatedCarbs.value = totalCarbs;
+				}}
+				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
+			>
+				Copy to insulin calculator
 			</button>
 
 			</div>
