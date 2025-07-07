@@ -11,7 +11,7 @@
 	import ComboBox from "./ui/ComboBox.svelte";
 	import MealComponentEntry from "./ui/MealComponentEntry.svelte";
 
-	import { mealCalculatedCarbs } from "./state.svelte";
+	import { appState } from "./state.svelte";
 
 	// Fetch meals from Notion function
 	async function fetchMeals() {
@@ -169,7 +169,8 @@
 
 			<button
 				onclick={() => {
-					mealCalculatedCarbs.value = totalCarbs;
+					appState.mealCalculatedCarbs = totalCarbs;
+					appState.activeFunction = 'insulin';
 				}}
 				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
 			>

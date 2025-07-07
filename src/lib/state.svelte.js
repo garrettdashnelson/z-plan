@@ -1,1 +1,1 @@
-export const mealCalculatedCarbs = $state({value: 0});
+export const appState = $state({ mealCalculatedCarbs: 0, activeFunction: 'insulin' });

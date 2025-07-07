@@ -1,7 +1,8 @@
 <script>
   import DexReader from "./DexReader.svelte";
   import settings from "./settings.json";
-  import { mealCalculatedCarbs } from "./state.svelte";
+
+  import { appState } from "./state.svelte";
 
   let currentBG = $state(150);
   let dexcomData = $state(null);
@@ -9,7 +10,7 @@
   let customTarget = $state(settings.dayTarget);
   let correctionMode = $state("default");
   let customCorrection = $state(settings.defaultCorrection);
-  let newCarbs = $derived(mealCalculatedCarbs.value);
+  let newCarbs = $derived(appState.mealCalculatedCarbs);
   let carbRatioMode = $state("default");
   let customCarbRatio = $state(settings.defaultCarbRatio);
   let doCalculateCorrection = $state(true);

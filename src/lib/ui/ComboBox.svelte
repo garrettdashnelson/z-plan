@@ -62,19 +62,39 @@
     //   highlightedIndex = -1;
     // }, 200);
   }
+
+  function closeMenu() {
+    isOpen = false;
+    highlightedIndex = -1;
+  }
 </script>
 
 <div class="relative w-full">
-  <input
-    type="text"
-    value={searchTerm}
-    oninput={handleInput}
-    onfocus={handleFocus}
-    onblur={handleBlur}
-    onkeydown={handleKeyDown}
-    class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent no-print"
-    placeholder="Add from Notion database…"
-  />
+  <div class="relative">
+    <input
+      type="text"
+      value={searchTerm}
+      oninput={handleInput}
+      onfocus={handleFocus}
+      onblur={handleBlur}
+      onkeydown={handleKeyDown}
+      class="w-full px-4 py-2 pr-10 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent no-print"
+      placeholder="Add from Notion database…"
+    />
+    
+    {#if isOpen}
+      <button
+        type="button"
+        onclick={closeMenu}
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+        aria-label="Close menu"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    {/if}
+  </div>
 
   {#if isOpen && filteredItems.length > 0}
     <ul
