@@ -22,18 +22,6 @@ interface NotionResponse {
     cached: boolean;
 }
 
-// In-memory cache
-let cache: {
-    timestamp: number;
-    data: object | null;
-} = {
-    timestamp: 0,
-    data: null
-};
-
-const CACHE_TTL_MS = 120 * 1000; // 2 minutes
-
-
 export const handler: Handler = async (event, context) => {
     const { NOTION_SECRET, NOTION_DATABASE_ID } = process.env;
 
@@ -51,16 +39,6 @@ export const handler: Handler = async (event, context) => {
         };
     }
 
-    const now = Date.now();
-
-    // Return cached data if valid
-    if (cache.data && now - cache.timestamp < CACHE_TTL_MS) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(cache.data)
-        };
-    }
-
     try {
         // Parse query parameters from the request
         const queryParams = event.queryStringParameters || {};
@@ -68,18 +46,18 @@ export const handler: Handler = async (event, context) => {
         const startCursor = queryParams.start_cursor || undefined;
 
         // Build the query object
-        const query: NotionDatabaseQuery = {
+        const baseQuery: NotionDatabaseQuery = {
             page_size: pageSize
         };
 
         if (startCursor) {
-            query.start_cursor = startCursor;
+            baseQuery.start_cursor = startCursor;
         }
 
         // Add filter if provided
         if (queryParams.filter) {
             try {
-                query.filter = JSON.parse(queryParams.filter);
+                baseQuery.filter = JSON.parse(queryParams.filter);
             } catch (e) {
                 return {
                     statusCode: 400,
@@ -91,7 +69,7 @@ export const handler: Handler = async (event, context) => {
         // Add sorts if provided
         if (queryParams.sorts) {
             try {
-                query.sorts = JSON.parse(queryParams.sorts);
+                baseQuery.sorts = JSON.parse(queryParams.sorts);
             } catch (e) {
                 return {
                     statusCode: 400,
@@ -99,31 +77,6 @@ export const handler: Handler = async (event, context) => {
                 };
             }
         }
-
-        // Make request to Notion API
-        const response = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${NOTION_SECRET}`,
-                'Notion-Version': '2022-06-28',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(query)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Notion API error:', response.status, errorText);
-            return {
-                statusCode: response.status,
-                body: JSON.stringify({ 
-                    error: 'Failed to query Notion database',
-                    details: errorText
-                })
-            };
-        }
-
-        const data: NotionResponse = await response.json();
 
         // Set CORS headers for browser access
         const headers = {
@@ -133,19 +86,58 @@ export const handler: Handler = async (event, context) => {
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
         };
 
-        let d = {
-            success: true,
-            data: data.results,
-            next_cursor: data.next_cursor,
-            has_more: data.has_more,
-            total_results: data.results.length
+        // Iteratively fetch all pages
+        let allResults: NotionPage[] = [];
+        let next_cursor: string | undefined = baseQuery.start_cursor;
+        let has_more = true;
+        let total_results = 0;
+        let first = true;
+
+        while (has_more) {
+            const query: NotionDatabaseQuery = { ...baseQuery };
+            if (!first) {
+                query.start_cursor = next_cursor;
+            }
+            first = false;
+
+            const response = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${NOTION_SECRET}`,
+                    'Notion-Version': '2022-06-28',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(query)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Notion API error:', response.status, errorText);
+                return {
+                    statusCode: response.status,
+                    headers,
+                    body: JSON.stringify({ 
+                        error: 'Failed to query Notion database',
+                        details: errorText
+                    })
+                };
+            }
+
+            const data: NotionResponse = await response.json();
+            allResults = allResults.concat(data.results);
+            next_cursor = data.next_cursor || undefined;
+            has_more = data.has_more;
         }
 
-        cache = {
-            timestamp: now,
-            data: d
-        };
+        total_results = allResults.length;
 
+        let d = {
+            success: true,
+            data: allResults,
+            next_cursor: null,
+            has_more: false,
+            total_results
+        };
 
         return {
             statusCode: 200,
