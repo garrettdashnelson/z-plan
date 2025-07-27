@@ -10,6 +10,7 @@
 
 	import ComboBox from "./ui/ComboBox.svelte";
 	import MealComponentEntry from "./ui/MealComponentEntry.svelte";
+	import CustomMealComponentEntry from "./ui/CustomMealComponentEntry.svelte";
 
 	import { appState } from "./state.svelte";
 
@@ -63,10 +64,15 @@
 	let totalCarbs = $derived(
 		computedMeal.reduce(
 			(sum, entry) =>
-				sum +
+				{ if (entry.custom) {
+					return sum + entry.carbCount;
+				} else {
+					return sum +
 				(meals.find((m) => m.id === entry.id)?.properties["Carb Count"]
 					?.number || 0) *
-					entry.multiplier,
+					entry.multiplier;
+				}
+			},
 			0,
 		),
 	);
@@ -74,17 +80,21 @@
 	let textRenderedComputedMeal = $derived.by(() => {
 		let text = computedMeal
 			.map((entry) => {
-				const meal = meals.find((m) => m.id === entry.id);
-				const carbCount =
-					(meal?.properties["Carb Count"]?.number || 0) *
-					entry.multiplier;
-				const servingAmount =
-					(meal?.properties["Serving unit amount"]?.number || 0) *
-					entry.multiplier;
-				const servingUnit =
-					meal?.properties["Serving unit measure"]?.rich_text?.[0]
-						?.plain_text || "";
-				return `• ${meal?.name}: ${carbCount.toFixed(1)}g carbs in ${servingAmount.toFixed(1)} ${servingUnit}`;
+				if (entry.custom) {
+					return `• ${entry.name}: ${entry.carbCount.toFixed(2)}g carbs`;
+				} else {
+					const meal = meals.find((m) => m.id === entry.id);
+					const carbCount =
+						(meal?.properties["Carb Count"]?.number || 0) *
+						entry.multiplier;
+					const servingAmount =
+						(meal?.properties["Serving unit amount"]?.number || 0) *
+						entry.multiplier;
+					const servingUnit =
+						meal?.properties["Serving unit measure"]?.rich_text?.[0]
+							?.plain_text || "";
+					return `• ${meal?.name}: ${carbCount.toFixed(2)}g carbs in ${servingAmount.toFixed(2)} ${servingUnit}`;
+				}
 			})
 			.join("\n");
 		text += `\n\nTotal carbs: ${totalCarbs}g`;
@@ -112,8 +122,30 @@
 			<ComboBox items={meals} onSelect={handleMealSelect} />
 		</div>
 
+		<button
+			onclick={() => {
+				const customMeal = {
+					id: 'custom-' + Date.now(),
+					custom: true,
+					name: 'Custom Entry',
+					carbCount: 0
+				};
+				computedMeal.push(customMeal);
+			}}
+			class="mt-4 mb-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded no-print"
+		>
+			➕ Add Custom Entry
+		</button>
+
 		{#if computedMeal && computedMeal.length > 0}
+			<button
+				onclick={() => computedMeal = []}
+				class="mt-4 mb-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded no-print"
+			>
+				⛔️ Clear all
+			</button>
 			{#each computedMeal as entry, index}
+			{#if !entry.custom}
 				<MealComponentEntry
 					meal={meals.find((m) => m.id === entry.id)}
 					{entry}
@@ -121,26 +153,23 @@
 					removeItem={() => removeItem(index)
 					}
 				/>
+				{:else}
+				<CustomMealComponentEntry
+					entry={entry}
+					removeItem={() => removeItem(index)}
+				/>
+				{/if}
+
 			{/each}
 
 			<div class="mt-8 p-4 {printFormat ? '' : 'bg-red-900 rounded-md'}">
 				<div class="{printFormat ? 'text-6xl text-black' : 'text-lg text-white'}  font-bold">
-					Total carbs: {totalCarbs.toFixed(1)}g
+					Total carbs: {totalCarbs.toFixed(2)}g
 				</div>
 			</div>
 			<textarea id="rendered-meal-text" readonly class="hidden" bind:value={textRenderedComputedMeal} />
 			<div>
-			<button
-				onclick={() => {
-					const textarea = document.getElementById('rendered-meal-text');
-					textarea.select();
-					navigator.clipboard.writeText(textarea.value);
-					window.alert("Copied to clipboard");
-				}}
-				class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
-			>
-				Copy to clipboard
-			</button>
+			
 			<button
 				onclick={() => {
 					if (navigator.share) {
@@ -175,6 +204,17 @@
 				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
 			>
 				Copy to insulin calculator
+			</button>
+			<button
+				onclick={() => {
+					const textarea = document.getElementById('rendered-meal-text');
+					textarea.select();
+					navigator.clipboard.writeText(textarea.value);
+					window.alert("Copied to clipboard");
+				}}
+				class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
+			>
+				Copy to clipboard
 			</button>
 
 			</div>

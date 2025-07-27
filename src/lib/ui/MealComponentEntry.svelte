@@ -23,9 +23,9 @@
     </div>
     <div class="flex flex-row justify-between items-center {printFormat ? 'text-4xl' : 'text-sm'}">
         <div>
-            <strong>{carbCount.toFixed(1)}g</strong> carbs in serving
+            <strong>{carbCount.toFixed(2)}g</strong> carbs in serving
             <strong
-                >{servingAmount.toFixed(1)}
+                >{servingAmount.toFixed(2)}
                 {meal.properties["Serving unit measure"]?.rich_text?.[0]
                     ?.plain_text || ""}</strong
             >
