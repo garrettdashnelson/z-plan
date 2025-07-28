@@ -54,7 +54,16 @@
 
 	// Handle meal selection
 	function handleMealSelect(item) {
-		computedMeal.push({ id: item.id, multiplier: 1 });
+		if (item.custom) {
+			computedMeal.push({
+				name: item.name,
+				id: "custom-" + Date.now(),
+				carbCount: 0,
+				custom: true,
+			});
+		} else {
+			computedMeal.push({ id: item.id, multiplier: 1 });
+		}
 	}
 
 	function removeItem(index) {
@@ -62,19 +71,19 @@
 	}
 
 	let totalCarbs = $derived(
-		computedMeal.reduce(
-			(sum, entry) =>
-				{ if (entry.custom) {
-					return sum + entry.carbCount;
-				} else {
-					return sum +
-				(meals.find((m) => m.id === entry.id)?.properties["Carb Count"]
-					?.number || 0) *
-					entry.multiplier;
-				}
-			},
-			0,
-		),
+		computedMeal.reduce((sum, entry) => {
+			if (entry.custom) {
+				return sum + entry.carbCount;
+			} else {
+				return (
+					sum +
+					(meals.find((m) => m.id === entry.id)?.properties[
+						"Carb Count"
+					]?.number || 0) *
+						entry.multiplier
+				);
+			}
+		}, 0),
 	);
 
 	let textRenderedComputedMeal = $derived.by(() => {
@@ -107,7 +116,13 @@
 	});
 </script>
 
-<div class="{printFormat ? 'max-w-full' : 'max-w-lg'} mx-auto p-6 bg-white rounded-lg {printFormat ? 'shadow-none' : 'shadow-md'}">
+<div
+	class="{printFormat
+		? 'max-w-full'
+		: 'max-w-lg'} mx-auto p-4 sm:p-6 bg-white rounded-lg {printFormat
+		? 'shadow-none'
+		: 'shadow-md'}"
+>
 	{#if loading}
 		<div class="loading">
 			<p>Loading data from Notion...</p>
@@ -122,101 +137,94 @@
 			<ComboBox items={meals} onSelect={handleMealSelect} />
 		</div>
 
-		<button
-			onclick={() => {
-				const customMeal = {
-					id: 'custom-' + Date.now(),
-					custom: true,
-					name: 'Custom Entry',
-					carbCount: 0
-				};
-				computedMeal.push(customMeal);
-			}}
-			class="mt-4 mb-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded no-print"
-		>
-			➕ Add Custom Entry
-		</button>
-
 		{#if computedMeal && computedMeal.length > 0}
 			<button
-				onclick={() => computedMeal = []}
-				class="mt-4 mb-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded no-print"
+				onclick={() => (computedMeal = [])}
+				class="mt-4 mb-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 sm:px-4 rounded no-print text-sm sm:text-base"
 			>
 				⛔️ Clear all
 			</button>
 			{#each computedMeal as entry, index}
-			{#if !entry.custom}
-				<MealComponentEntry
-					meal={meals.find((m) => m.id === entry.id)}
-					{entry}
-					{printFormat}
-					removeItem={() => removeItem(index)
-					}
-				/>
+				{#if !entry.custom}
+					<MealComponentEntry
+						meal={meals.find((m) => m.id === entry.id)}
+						{entry}
+						{printFormat}
+						removeItem={() => removeItem(index)}
+					/>
 				{:else}
-				<CustomMealComponentEntry
-					entry={entry}
-					removeItem={() => removeItem(index)}
-				/>
+					<CustomMealComponentEntry
+						{entry}
+						removeItem={() => removeItem(index)}
+					/>
 				{/if}
-
 			{/each}
 
 			<div class="mt-8 p-4 {printFormat ? '' : 'bg-red-900 rounded-md'}">
-				<div class="{printFormat ? 'text-6xl text-black' : 'text-lg text-white'}  font-bold">
+				<div
+					class="{printFormat
+						? 'text-6xl text-black'
+						: 'text-lg text-white'}  font-bold"
+				>
 					Total carbs: {totalCarbs.toFixed(2)}g
 				</div>
 			</div>
-			<textarea id="rendered-meal-text" readonly class="hidden" bind:value={textRenderedComputedMeal} />
-			<div>
-			
-			<button
-				onclick={() => {
-					if (navigator.share) {
-						navigator.share({
-							text: textRenderedComputedMeal
-						}).catch(err => {
-							console.error('Share failed:', err);
-						});
-					}
-				}}
-				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
-			>
-				Share
-			</button>
-			<button
-				onclick={() => {
-					printFormat = true;
-					setTimeout(() => {
-						window.print();
-					}, 100);
-				}}
-				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
-			>
-				Print
-			</button>
+			<textarea
+				id="rendered-meal-text"
+				readonly
+				class="hidden"
+				bind:value={textRenderedComputedMeal}
+			/>
+			<div class="flex flex-wrap gap-2">
+				<button
+					onclick={() => {
+						if (navigator.share) {
+							navigator
+								.share({
+									text: textRenderedComputedMeal,
+								})
+								.catch((err) => {
+									console.error("Share failed:", err);
+								});
+						}
+					}}
+					class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 sm:px-4 rounded no-print text-sm sm:text-base"
+				>
+					Share
+				</button>
+				<button
+					onclick={() => {
+						printFormat = true;
+						setTimeout(() => {
+							window.print();
+						}, 100);
+					}}
+					class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 sm:px-4 rounded no-print text-sm sm:text-base"
+				>
+					Print
+				</button>
 
-			<button
-				onclick={() => {
-					appState.mealCalculatedCarbs = totalCarbs;
-					appState.activeFunction = 'insulin';
-				}}
-				class="mt-4 ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
-			>
-				Copy to insulin calculator
-			</button>
-			<button
-				onclick={() => {
-					const textarea = document.getElementById('rendered-meal-text');
-					textarea.select();
-					navigator.clipboard.writeText(textarea.value);
-					window.alert("Copied to clipboard");
-				}}
-				class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-print"
-			>
-				Copy to clipboard
-			</button>
-
+				<button
+					onclick={() => {
+						appState.mealCalculatedCarbs = totalCarbs;
+						appState.activeFunction = "insulin";
+					}}
+					class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 sm:px-4 rounded no-print text-sm sm:text-base"
+				>
+					Copy to insulin calculator
+				</button>
+				<button
+					onclick={() => {
+						const textarea =
+							document.getElementById("rendered-meal-text");
+						textarea.select();
+						navigator.clipboard.writeText(textarea.value);
+						window.alert("Copied to clipboard");
+					}}
+					class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 sm:px-4 rounded no-print text-sm sm:text-base"
+				>
+					Copy to clipboard
+				</button>
 			</div>
 		{/if}
 	{/if}
