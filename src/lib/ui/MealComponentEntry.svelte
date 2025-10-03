@@ -1,12 +1,25 @@
 <script>
-    let { meal, removeItem, entry, printFormat } = $props();
+    let { meal, removeItem, entry, printFormat, updateMultiplier } = $props();
+
+    // Get the base serving amount from the meal properties
+    let baseServingAmount = meal.properties["Serving unit amount"]?.number || 1;
+    
+    // Calculate current serving amount from multiplier
+    let servingAmount = $derived(
+        baseServingAmount * entry.multiplier
+    );
 
     let carbCount = $derived(
         meal.properties["Carb Count"]?.number * entry.multiplier || 0,
     );
-    let servingAmount = $derived(
-        meal.properties["Serving unit amount"]?.number * entry.multiplier || 0,
-    );
+
+    // Function to update multiplier when servingAmount changes
+    function handleServingAmountChange(newServingAmount) {
+        if (baseServingAmount > 0) {
+            const newMultiplier = newServingAmount / baseServingAmount;
+            updateMultiplier(newMultiplier);
+        }
+    }
 </script>
 
 <div class="flex flex-col justify-between {printFormat ? 'text-3xl' : 'bg-gray-100 rounded-lg p-2'} rounded-lg my-2">
@@ -21,25 +34,24 @@
             </button>
         </div>
     </div>
-    <div class="flex flex-row justify-between items-center {printFormat ? 'text-4xl' : 'text-sm'}">
+    <div class="flex flex-row justify-between items-center {printFormat ? 'text-4xl' : 'text-md'}">
         <div>
-            <strong>{carbCount.toFixed(2)}g</strong> carbs in serving
-            <strong
-                >{servingAmount.toFixed(2)}
-                {meal.properties["Serving unit measure"]?.rich_text?.[0]
-                    ?.plain_text || ""}</strong
-            >
-        </div>
-        <div class="no-print">
-            ✖️
+            <strong class="font-black">{carbCount.toFixed(1)}g</strong> carbs in
             <input
-                class="bg-gray-200 rounded-md text-lg p-1 w-12"
+                class="bg-gray-200 rounded-md text-lg font-black p-1 w-18 mx-1 no-print"
                 type="number"
                 inputmode="decimal"
                 pattern="[0-9]*"
                 min="0"
-                bind:value={entry.multiplier}
+                step="0.1"
+                value={servingAmount}
+                oninput={(e) => handleServingAmountChange(parseFloat(e.target.value) || 0)}
             />
+            <strong
+                >{meal.properties["Serving unit measure"]?.rich_text?.[0]
+                    ?.plain_text || ""}</strong
+            >
         </div>
     </div>
 </div>
+

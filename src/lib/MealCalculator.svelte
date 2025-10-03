@@ -55,19 +55,30 @@
 	// Handle meal selection
 	function handleMealSelect(item) {
 		if (item.custom) {
-			computedMeal.push({
+			computedMeal = [...computedMeal, {
 				name: item.name,
 				id: "custom-" + Date.now(),
 				carbCount: 0,
 				custom: true,
-			});
+				entryId: "custom-" + Date.now() + "-" + Math.random(),
+			}];
 		} else {
-			computedMeal.push({ id: item.id, multiplier: 1 });
+			computedMeal = [...computedMeal, { 
+				id: item.id, 
+				multiplier: 1,
+				entryId: item.id + "-" + Date.now() + "-" + Math.random()
+			}];
 		}
 	}
 
 	function removeItem(index) {
-		computedMeal.splice(index, 1);
+		computedMeal = computedMeal.filter((_, i) => i !== index);
+	}
+
+	function updateEntryMultiplier(index, newMultiplier) {
+		computedMeal = computedMeal.map((entry, i) => 
+			i === index ? { ...entry, multiplier: newMultiplier } : entry
+		);
 	}
 
 	let totalCarbs = $derived(
@@ -106,7 +117,7 @@
 				}
 			})
 			.join("\n");
-		text += `\n\nTotal carbs: ${totalCarbs}g`;
+		text += `\n\nTotal carbs: ${totalCarbs.toFixed(2)}g`;
 		return text;
 	});
 
@@ -144,13 +155,14 @@
 			>
 				⛔️ Clear all
 			</button>
-			{#each computedMeal as entry, index}
+			{#each computedMeal as entry, index (entry.entryId)}
 				{#if !entry.custom}
 					<MealComponentEntry
 						meal={meals.find((m) => m.id === entry.id)}
 						{entry}
 						{printFormat}
 						removeItem={() => removeItem(index)}
+						updateMultiplier={(newMultiplier) => updateEntryMultiplier(index, newMultiplier)}
 					/>
 				{:else}
 					<CustomMealComponentEntry
@@ -174,7 +186,7 @@
 				readonly
 				class="hidden"
 				bind:value={textRenderedComputedMeal}
-			/>
+			></textarea>
 			<div class="flex flex-wrap gap-2">
 				<button
 					onclick={() => {
