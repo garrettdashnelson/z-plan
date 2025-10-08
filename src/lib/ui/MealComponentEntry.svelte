@@ -5,9 +5,9 @@
     let baseServingAmount = meal.properties["Serving unit amount"]?.number || 1;
     
     // Calculate current serving amount from multiplier
-    let servingAmount = $derived(
+    let servingAmount = 
         baseServingAmount * entry.multiplier
-    );
+    ;
 
     let carbCount = $derived(
         meal.properties["Carb Count"]?.number * entry.multiplier || 0,
