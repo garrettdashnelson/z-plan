@@ -11,7 +11,9 @@ interface DexcomResponse {
     value: number;
     trend: number;
     trendDescription: string;
+    trendDescriptionUnicode: string;
     timestamp: string;
+    parsedTimestamp: string;
     cached: boolean;
 }
 
@@ -34,6 +36,10 @@ export const handler: Handler = async (event, context) => {
     if (!DEXCOM_USERNAME || !DEXCOM_PASSWORD) {
         return {
             statusCode: 500,
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Cache-Control': 'no-cache'
+            },
             body: JSON.stringify({ error: 'Missing Dexcom credentials in environment' })
         };
     }
@@ -44,6 +50,10 @@ export const handler: Handler = async (event, context) => {
     if (cache.data && now - cache.timestamp < CACHE_TTL_MS) {
         return {
             statusCode: 200,
+            headers: {
+                'Cache-Control': 'public, max-age=120, s-maxage=120',
+                'Content-Type': 'application/json; charset=utf-8'
+            },
             body: JSON.stringify(cache.data)
         };
     }
@@ -92,6 +102,19 @@ export const handler: Handler = async (event, context) => {
             "RateOutOfRange": '&#10060;'
         };
 
+        const trendDescriptionsUnicode: Record<string, string> = {
+            "None": '❌',
+            "DoubleUp": '↑↑',
+            "SingleUp": '↑',
+            "FortyFiveUp": '↗',
+            "Flat": '→',
+            "FortyFiveDown": '↘',
+            "SingleDown": '↓',
+            "DoubleDown": '↓↓',
+            "NotComputable": '❌',
+            "RateOutOfRange": '❌'
+        };
+
         const timestampMillis = parseInt(reading.WT.match(/\d+/)?.[0] || '0', 10);
         const isoTimestamp = new Date(timestampMillis).toISOString();
 
@@ -99,17 +122,23 @@ export const handler: Handler = async (event, context) => {
             value: reading.Value,
             trend: reading.Trend,
             trendDescription: trendDescriptions[reading.Trend] || 'Unknown',
+            trendDescriptionUnicode: trendDescriptionsUnicode[reading.Trend] || 'Unknown',
             timestamp: isoTimestamp,
+            parsedTimestamp: new Date(isoTimestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York' }),
             cached: false
         };
 
         cache = {
             timestamp: now,
-            data: result
+            data: { ...result, cached: true }
         };
 
         return {
             statusCode: 200,
+            headers: {
+                'Cache-Control': 'public, max-age=120, s-maxage=120',
+                'Content-Type': 'application/json; charset=utf-8'
+            },
             body: JSON.stringify(result)
         };
     } catch (err: unknown) {
@@ -117,6 +146,10 @@ export const handler: Handler = async (event, context) => {
         console.error(error?.response?.data || error?.message || error);
         return {
             statusCode: 500,
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Cache-Control': 'no-cache'
+            },
             body: JSON.stringify({ error: error.message})
         };
     }
